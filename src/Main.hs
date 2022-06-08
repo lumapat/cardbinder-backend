@@ -17,15 +17,25 @@ import           Data.Proxy
 import           Mu.GraphQL.Quasi
 import           Mu.GraphQL.Server
 import           Mu.Server
+import           Network.Wai.Handler.Warp (run)
+import           Network.Wai.Middleware.Cors
+import           Network.Wai.Middleware.RequestLogger (logStdoutDev)
 
 graphql "ServiceDefinition" "schema.graphql"
 
 -- GraphQL App
 
+customCors = cors (const $ Just policy)
+  where
+    policy = simpleCorsResourcePolicy
+      { corsRequestHeaders = ["Authorization", "Content-Type"]
+      , corsMethods = simpleMethods ++ ["OPTIONS"]
+      }
+
 main :: IO ()
 main = do
-  putStrLn "starting GraphQL server on port 8080"
-  runGraphQLAppQuery 8080 server (Proxy @"Query")
+  putStrLn "Starting GraphQL server on port 8080"
+  run 8080 $ customCors $ logStdoutDev $ graphQLAppQuery server (Proxy @"Query")
 
 type ServiceMapping = '[]
 
