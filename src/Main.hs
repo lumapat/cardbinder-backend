@@ -40,4 +40,4 @@ main = do
 type ServiceMapping = '[]
 
 server :: MonadServer m => ServerT ServiceMapping i ServiceDefinition m _
-server = resolver ( object @"Query" ( method @"hello" $ pure "Hooooooray" ) )
+server = resolver ( object @"Query" ( method @"hello" $ pure "Server Hello" ) )
